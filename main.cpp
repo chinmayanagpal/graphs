@@ -1,24 +1,34 @@
-#include "shortest_path_algo.hpp"
+#include "shortest_path_alg.hpp"
+#include <string>
 
-int main() {
-	wgraph<9> G;
-        G.set_edge(0, 1, 4);
-        G.set_edge(0, 7, 8);
-        G.set_edge(1, 7, 11);
-        G.set_edge(1, 2, 8);
-        G.set_edge(7, 8, 7);
-        G.set_edge(2, 8, 2);
-        G.set_edge(6, 8, 6);
-        G.set_edge(7, 6, 1);
-        G.set_edge(2, 5, 4);
-        G.set_edge(6, 5, 2);
-        G.set_edge(2, 3, 7);
-        G.set_edge(3, 5, 14);
-        G.set_edge(3, 4, 9);
-        G.set_edge(5, 4, 10);
-        shortest_path_alg<9> d(G);
-	std::vector<size_t> u = d.path(0, 2);
-	for (size_t i: u)
-		std::cout<<i<<" ";
-	std::cout<<std::endl;
+int main(int argc, char* argv[]) {
+
+	// float prob;
+	// try {
+	// 	prob = std::stof(argv[1]);
+	// } catch (...) {
+	// 	prob = 0.2;
+	// }
+
+	// float avgavg = 0;
+	// for (int j = 0; j < 100; ++j) {
+	// 	wgraph G(50, true, prob, 1.0, 10.0);
+	// 	shortest_path_alg<50> sp(G);
+	// 	double avg = 0;
+	// 	int edges = 0;
+	// 	for (int i = 1; i < 50; ++i)
+	// 	{
+	// 		float size = sp.path_size(0, i); 
+	// 		if (sp.path_size(0, i) != INFINITY) {
+	// 			avg += size;
+	// 			edges++;
+	// 		}
+	// 	}
+	// 	avg /= edges;
+	// 	avgavg += avg;
+	// }
+	// avgavg /= 100;
+	// std::cout<<avgavg<<std::endl;
+	wgraph G("testdata.txt");
+	G.print();
 }

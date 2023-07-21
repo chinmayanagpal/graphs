@@ -2,14 +2,18 @@
 #include <math.h>
 #include "priorityqueue.hpp"
 
+// Implements the shortest path algorithm for graphs as described in
+// https://math.libretexts.org/Bookshelves/Combinatorics_and_Discrete_Mathematics/Applied_Combinatorics_(Keller_and_Trotter)/12%3A_Graph_Algorithms/12.03%3A_Dijkstra%27s_Algorithm_for_Shortest_Paths
 template<size_t N>
 class shortest_path_alg {
 public:
-	shortest_path_alg(wgraph<N> G);
+	explicit shortest_path_alg(wgraph G);
+
         float path_size(size_t src, size_t dst);
+
 	std::vector<size_t> path(size_t src, size_t dst);
 private:
-	wgraph<N> G;
+	wgraph G;
 	float d[N][N];
 	std::vector<size_t> P[N][N];
         void set_distance(size_t i, size_t j, float x) {
@@ -17,7 +21,16 @@ private:
 	}
 };
 
-// https://math.libretexts.org/Bookshelves/Combinatorics_and_Discrete_Mathematics/Applied_Combinatorics_(Keller_and_Trotter)/12%3A_Graph_Algorithms/12.03%3A_Dijkstra%27s_Algorithm_for_Shortest_Paths
+template<size_t N>
+shortest_path_alg<N>::shortest_path_alg(wgraph G):G(G) {
+	for (size_t i = 0; i < N; ++i)
+		for (size_t j = 0; j < N; ++j)
+			if (i == j)
+				d[i][j] = 0;
+			else
+				d[i][j] = INFINITY;
+}
+
 template<size_t N>
 float shortest_path_alg<N>::path_size(size_t src, size_t dst)
 {
@@ -53,17 +66,6 @@ float shortest_path_alg<N>::path_size(size_t src, size_t dst)
                 }
         }
 	return d[src][dst];
-}
-
-
-template<size_t N>
-shortest_path_alg<N>::shortest_path_alg(wgraph<N> G):G(G) {
-	for (size_t i = 0; i < N; ++i)
-		for (size_t j = 0; j < N; ++j)
-			if (i == j)
-				d[i][j] = 0;
-			else
-				d[i][j] = INFINITY;
 }
 
 template <size_t N>
