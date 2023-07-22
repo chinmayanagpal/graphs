@@ -1,51 +1,40 @@
 #include "wgraph.hpp"
 
-wgraph::wgraph(int N, bool rand, float prob, float low, float high): N(N), matrix(N, std::vector<float>(N)) {
+// Initialises a graph of size N. If rand is true, then the adjacency matrix is
+// random generated where each non-loop edge has a chance 0.0 < prob < 1.0 of
+// occuring and the weight is randomly assigned a value between low and high
+// based on a uniform distribution of reals. If rand is false, a discrete graph
+// is initialised
+wgraph::wgraph(size_t N, bool rand, float prob, float low, float high): N(N), matrix(N, std::vector<float>(N))
+{
 	if (rand)
 		randomly_populate(prob, low, high);
 	else
 		zero();
 }
 
-bool wgraph::is_connected() {
-	if (connected_run)
-		return connected;
-
-	size_t queue[N];
-
-	// initially place the node 0 in the queue
-	// and set the size to 1
-	queue[0] = 0; 
-	size_t  queue_size = 1;
-	size_t queue_pos = 0;
-
-	// visited[n] is true if the node n has been visited
-	bool visited[N];
-	visited[0] = true;
-
-	while (queue_pos < queue_size) {
-		//current node
-		size_t curr = queue[queue_pos];
-		for (size_t i = 0; i < N; ++i)
-			// Add i to the queue and mark it as visited: there is
-			// an edge between the current node and i has not
-			// already been visited.
-			if (matrix[curr][i] > 0 && !visited[i]) {
-				visited[i] = true;
-				queue[queue_size++] = i;
-				if (queue_size == N) {
-					connected_run = true;
-					connected = true;
-					return true;
-				}
-			}
-		queue_pos++;
-	}
-	connected_run = true;
-	connected = false;
-	return false;
+// returns the number of vertices in the wgraph
+size_t wgraph::size()
+{
+	return N;
 }
 
+// returns the list of edges in the wgraph
+std::vector<std::pair<size_t, size_t>> wgraph::edges()
+{
+	if (edge_list.size())
+		return edge_list;
+
+	else
+		for (size_t i = 0; i < N; ++i)
+			for(size_t j = i; j < N; ++j)
+				if (matrix[i][j] != 0.0 && matrix[i][j] != INFINITY)
+					edge_list.push_back(std::pair<size_t, size_t>(i, j));
+	return edge_list;
+}
+
+// randomly populates the graph as described in the comment above the
+// constructor
 void wgraph::randomly_populate(float prob, float low, float high)
 {
 	std::random_device rd;
@@ -61,41 +50,51 @@ void wgraph::randomly_populate(float prob, float low, float high)
 				set_edge(i, j, wdist(gen));
 }
 
-
-
-void wgraph::zero() {
+// deletes all edges (graph is discrete)
+void wgraph::zero()
+{
 	for (size_t i = 0; i < N; ++i)
 		for (size_t j = 0; j < N; ++j)
 			if (i == j)
 				matrix[i][j] = 0;
 			else
 				matrix[i][j] = INFINITY;
+	E = 0;
 }
 
-// setters
-void wgraph::set_edge(size_t i, size_t j, float x) {
+// assigns edge (i, j) the weight x
+void wgraph::set_edge(size_t i, size_t j, float x)
+{
 	if (i >= N || j >= N || i < 0 || j < 0) {
 		std::cout<<"Indices out of bounds. This is a graph of N vertices.\n";
-		std::exit(1);
+		std::abort();
 	}
+
+	if (x == INFINITY && matrix[i][j] != INFINITY)
+		E++;
+	else if (x == INFINITY && matrix[i][j] != INFINITY)
+		E--;
+
 	matrix[i][j] = x;
 	matrix[j][i] = x;
-	connected_run = false;
 }
 
 // getter
-float wgraph::weight(size_t i, size_t j) {
+float wgraph::weight(size_t i, size_t j)
+{
 	if (i >= N || j >= N || i < 0 || j < 0) {
 		std::cout<<"Indices out of bounds. This is a graph of N vertices.\n";
-		std::exit(1);
+		std::abort();
 	}
 	return matrix[i][j];
 }
 
-std::vector<size_t> wgraph::neighbours(size_t x) {
+// returns the list of vertices which share an edge with x
+std::vector<size_t> wgraph::neighbours(size_t x)
+{
 	if (x >= N || x < 0) {
 		std::cout<<"Index out of bounds. This is a graph of N vertices.\n";
-		std::exit(1);
+		std::abort();
 	}
 	std::vector<size_t> ne;
 	for (size_t i = 0; i < N; ++i)
@@ -104,7 +103,9 @@ std::vector<size_t> wgraph::neighbours(size_t x) {
 	return ne;
 }
 
-void wgraph::print() {
+// prints the graph (awfully)
+void wgraph::print()
+{
 	for (size_t i = 0; i < N; ++i) {
 		for (size_t j = 0; j < N; ++j)
 			std::cout<<std::fixed
@@ -114,7 +115,12 @@ void wgraph::print() {
 	}
 }
 
-wgraph::wgraph(std::string filename) {
+// Initialises the graph using a file of the following format:
+// Line 1: number of vertices in graph
+// Line 2: node1 node2 weight
+// Line 3: node1 node2 weight
+wgraph::wgraph(std::string filename)
+{
 	std::ifstream file(filename);
 	file >> this->N;
 	matrix.resize(N);

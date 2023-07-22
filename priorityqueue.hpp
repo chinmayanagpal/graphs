@@ -6,11 +6,19 @@
 typedef std::size_t size_t;
 
 template <class T, class S>
+std::ostream& operator<< (std::ostream& os, const std::pair<T, S> e) {
+	os << "(" << e.first << ", " << e.second << ")";
+	return os;
+}
+
+template <class T, class S>
 struct prioritypair {
 	T val;
 	S priority;
 };
 
+// class T: value
+// class S: priority (has to support operator < : S x S -> bool)
 template <class T, class S>
 class priorityqueue {
 public:
@@ -26,11 +34,9 @@ public:
 
 	bool contains(T val);
 
-	S get_priority(T val);
+	S priority(T val);
 
 	void print();
-
-	void setchecks(bool checks = true);
 
 	std::vector<T> as_list();
 private:
@@ -87,7 +93,7 @@ void priorityqueue<T, S>::insert(T val, S priority) {
 				std::cout<<"PQ already contains val"
 					 <<val
 					 <<std::endl;
-				std::exit(1);
+				std::abort();
 			}
 		}
 	}
@@ -111,15 +117,6 @@ T priorityqueue<T, S>::pop() {
 template <class T, class S>
 void priorityqueue<T, S>::change_priority(T val, S priority) {
 	for (size_t i = 0; i < list.size(); ++i) {
-		if (checks && list[i].priority == priority && list[i].val != val)
-		{
-			std::cout<<list[i].val
-				 <<" already has priority "
-				 <<priority
-				 <<std::endl;
-
-			std::exit(1);
-		}
 		if (list[i].val == val) {
 			S orig = list[i].priority;
 			list[i].priority = priority;
@@ -150,12 +147,12 @@ bool priorityqueue<T, S>::contains(T val) {
 }
 
 template <class T, class S>
-S priorityqueue<T, S>::get_priority(T val) {
+S priorityqueue<T, S>::priority(T val) {
 	for(auto pair: list)
 		if (pair.val == val)
 			return pair.priority;
 	std::cout<<"Value "<<val<<" is not contained in PQ"<<std::endl;
-	exit(1);
+	std::abort();
 }
 
 template <class T, class S>
@@ -170,11 +167,6 @@ void priorityqueue<T, S>::print() {
 		if (((i + 2) & i) == 0 || i == list.size() - 1)
 			std::cout<<std::endl;
 	}
-}
-
-template <class T, class S>
-void priorityqueue<T, S>::setchecks(bool checks) {
-	this->checks = checks;
 }
 
 template <class T, class S>

@@ -3,10 +3,12 @@
 #include <random>
 #include <iomanip>
 #include <fstream>
+#include <utility>
+
 
 class wgraph {
 public:
-	wgraph(int N = 50, bool rand = false, float prob = 0.5, float low = 1.0, float high = 10);
+	wgraph(size_t N = 50, bool rand = false, float prob = 0.5, float low = 1.0, float high = 10);
 	wgraph(std::string filename);
 
 	void randomly_populate(float prob, float low = 1.0, float high = 10.0);
@@ -23,11 +25,13 @@ public:
 
 	void print();
 
-	bool is_connected();
+	size_t size();
+
+	std::vector<std::pair<size_t, size_t>> edges();
 private:
-	int N;
+	std::vector<std::pair<size_t, size_t>> edge_list;
+	size_t N;
+	size_t E;
 	std::vector<std::vector<float>> matrix;
-	bool connected_run = false;
-	bool connected = false;
 	bool rand = true;
 };
